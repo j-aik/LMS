@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+                .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 30%;
+            text-align: center;
+        }
+        .modal button {
+            margin: 10px;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .modal .confirm { background-color: red; color: white; }
+        .modal .cancel { background-color: gray; color: white; }
+    </style>
+</head>
+<body>
+<h1>Hai admin, {{ f }}</h1>
+<h1>All Users</h1>
+    <ul>
+        {% for item in f1 %}
+            <li>
+                {{ item.username }}
+       <button class="delete" onclick=""
+        style="background-color: red; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
+          <a href="{% url 'LMSapp:delete' item.id %}">
+         Delete
+          </a>
+        </button>
+{% if item.is_active %}
+<span>
+
+         <button class="delete" onclick=""
+        style="background-color: red; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
+          <a href="{% url 'LMSapp:active' item.id %}">
+          SET TO NO ACTIVE
+          </a>
+        </button>
+
+</span>
+{% else %}
+ <span>
+
+        <button class="delete" onclick=""
+        style="background-color: red; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
+          <a href="{% url 'LMSapp:active' item.id %}">
+          SET TO ACTIVE
+          </a>
+        </button>
+
+</span>
+
+ {% endif %}
+
+
+
+        {% endfor %}
+    </ul>
+
+<div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <p id="modalMessage">change the options</p>
+            <button class="confirm" id="confirmAction">Yes</button>
+
+            <button class="cancel" onclick="closeModal()">Cancel</button>
+        </div>
+</div>
+
+ <script>
+        let actionType = "";
+        let userId = "";
+
+        function openModal(action, id) {
+            actionType = action;
+            userId = id;
+            document.getElementById("modalMessage").innerText =
+                action === "delete" ? "Are you sure you want to delete this user?"
+                                    : "Are you sure you want to deactivate this user?";
+
+            document.getElementById("confirmationModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("confirmationModal").style.display = "none";
+        }
+
+        document.getElementById("confirmAction").addEventListener("click", function () {
+            if (actionType === "delete") {
+                fetch(`/delete-user/${userId}/`, { method: "POST", headers: { "X-CSRFToken": getCSRFToken() } })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("User deleted successfully!");
+                            location.reload();
+                        } else {
+                            alert("Error deleting user.");
+                        }
+                    });
+            } else if (actionType === "deactivate") {
+                fetch(`/deactivate-user/${userId}/`, { method: "POST", headers: { "X-CSRFToken": getCSRFToken() } })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("User deactivated successfully!");
+                            location.reload();
+                        } else {
+                            alert("Error deactivating user.");
+                        }
+                    });
+            }
+            closeModal();
+        });
+
+        function getCSRFToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+    </script>
+</body>
+</html>
