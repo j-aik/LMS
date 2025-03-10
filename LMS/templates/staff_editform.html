@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User & Staff</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="email"], select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Edit User & Staff</h2>
+        <form method="post">
+            {% csrf_token %}
+            <h3>User Information</h3>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ user_form.username.value|default_if_none:'' }}" required>
+
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" value="{{ user_form.first_name.value|default_if_none:'' }}" required>
+
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" value="{{ user_form.last_name.value|default_if_none:'' }}" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ user_form.email.value|default_if_none:'' }}" required>
+
+            <label for="role">Role:</label>
+
+             <select id="role" name="role">
+                <option value="admin" {% if user_form.instance.is_admin %}selected{% endif %}>Admin</option>
+                <option value="staff" {% if user_form.instance.is_teacher %}selected{% endif %}>Staff</option>
+                <option value="user" {% if not user_form.instance.is_admin and not user_form.instance.is_teacher %}selected{% endif %}>User</option>
+            </select>
+
+
+            <h3>Staff Information</h3>
+            <label for="designation">Designation:</label>
+            <input type="text" id="designation" name="designation" value="{{ form.designation.value|default_if_none:'' }}" required>
+
+            <label for="subject">Subject:</label>
+             <select id="subject" name="subject">
+    {% for subject in form.fields.subject.queryset %}
+    <option value="{{ subject.id }}" {% if form.subject.value == subject.id %}selected{% endif %}>
+        {{ subject.subject }}
+    </option>
+    {% endfor %}
+</select>
+
+            <label for="class_assigned">Class Assigned:</label>
+            <select id="class_assigned" name="class_assigned">
+                {% for class in form.class_assigned.field.queryset %}
+                <option value="{{ class.id }}" {% if form.class_assigned.value == class.id %}selected{% endif %}>{{ class.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" id="phone_number" name="phone_number" value="{{ form.phone_number.value|default_if_none:'' }}" required>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</body>
+</html>
+
+

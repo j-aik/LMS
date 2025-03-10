@@ -22,13 +22,18 @@ class ClassST(models.Model):
         ]
     )
 
-    def _str(self):  # Fix incorrect __str_ method
+    def __str__(self):  # Fix incorrect __str_ method
         return self.name
 
 
+class Subject(models.Model):
+    subject = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.subject
 
 class CustomUser(AbstractUser):
-    designation = models.CharField(max_length=100,blank=True, null=True)
+
 
     is_student = models.BooleanField(default=False)
     is_parent = models.BooleanField(default=False)
@@ -49,7 +54,7 @@ class Parent(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15)
     address = models.TextField()
-
+    class_assigned = models.ForeignKey(ClassST, on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return self.user.username
 
@@ -58,20 +63,14 @@ class Parent(models.Model):
 class Staff(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     designation = models.CharField(max_length=100)
-    subjects_assigned = models.ManyToManyField(ClassST, blank=True)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)
+    class_assigned = models.ForeignKey(ClassST, on_delete=models.CASCADE, null=True, blank=True)
     phone_number = models.CharField(max_length=15)
 
     def __str__(self):
         return self.user.username
 
 
-class Subject(models.Model):
-    name = models.CharField(max_length=100)
-    class_assigned = models.ForeignKey(ClassST, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True)
-
-    def str(self):
-        return self.name
 
 
 class Student(models.Model):

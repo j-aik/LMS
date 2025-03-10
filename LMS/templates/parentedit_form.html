@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Parent Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h3 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #007bff;
+            box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+        }
+
+        button {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3>Edit Parent Details</h3>
+    <form id="editForm" method="POST" action="">
+        {% csrf_token %}
+
+        <h3>Parent Details</h3>
+        <div class="form-group">
+            <label for="{{ user_form.username.id_for_label }}">Username:</label>
+               {{ user_form.username }}
+        </div>
+         <input type="hidden" name="{{ user_form.password.name }}" value="{{ user_form.password.value|default:'' }}">
+
+          <div class="form-group">
+                 <label for="{{ user_form.date_joined.id_for_label }}">Date Joined:</label>
+                    {{ user_form.date_joined }}
+          </div>
+        <div class="form-group">
+            <label for="{{ user_form.first_name.id_for_label }}">First Name:</label>
+            {{ user_form.first_name }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ user_form.last_name.id_for_label }}">Last Name:</label>
+            {{ user_form.last_name }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ user_form.email.id_for_label }}">Email:</label>
+            {{ user_form.email }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.phone_number.id_for_label }}">Phone Number:</label>
+            {{ form.phone_number }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.address.id_for_label }}">Address:</label>
+            {{ form.address }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.class_assigned.id_for_label }}">Class Assigned:</label>
+            {{ form.class_assigned }}
+        </div>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+</body>
+</html>

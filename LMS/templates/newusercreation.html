@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User Account</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="mb-4">Create User Account</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <h3>User Roles</h3>
+<div class="form-check">
+    <input type="hidden" name="is_student" value="False">
+    <input type="checkbox" class="form-check-input role-checkbox" id="is_student" name="is_student" value="True">
+    <label class="form-check-label" for="is_student">Student</label>
+</div>
+
+<div class="form-check">
+    <input type="hidden" name="is_parent" value="False">
+    <input type="checkbox" class="form-check-input role-checkbox" id="is_parent" name="is_parent" value="True">
+    <label class="form-check-label" for="is_parent">Parent</label>
+</div>
+
+<div class="form-check">
+    <input type="hidden" name="is_admin" value="False">
+    <input type="checkbox" class="form-check-input role-checkbox" id="is_admin" name="is_admin" value="True">
+    <label class="form-check-label" for="is_admin">Admin</label>
+</div>
+
+<div class="form-check">
+    <input type="hidden" name="is_teacher" value="False">
+    <input type="checkbox" class="form-check-input role-checkbox" id="is_teacher" name="is_teacher" value="True">
+    <label class="form-check-label" for="is_teacher">Teacher</label>
+</div>
+
+            <!-- Student Fields -->
+            <div id="student-fields" class="hidden">
+                <h4>Student Details</h4>
+                <div class="mb-3">
+                    <label class="form-label" for="dob">Date of Birth</label>
+                    <input type="date" class="form-control" id="dob" name="date_of_birth">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="student_class">Class Assigned</label>
+                    <input type="text" class="form-control" id="student_class" name="class_assigned">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="attendance">Attendance Percentage</label>
+                    <input type="number" class="form-control" id="attendance" name="attendence_percentage" min="0" max="100">
+                </div>
+            </div>
+
+            <!-- Parent Fields -->
+            <div id="parent-fields" class="hidden">
+                <h4>Parent Details</h4>
+                <div class="mb-3">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="pusername" required>
+            </div>
+                <div class="mb-3">
+                    <label class="form-label" for="parent_phone">Phone Number</label>
+                    <input type="text" class="form-control" id="parent_phone" name="phone_number">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="parent_address">Address</label>
+                    <textarea class="form-control" id="parent_address" name="address"></textarea>
+                </div>
+            </div>
+
+            <!-- Teacher Fields -->
+            <div id="teacher-fields" class="hidden">
+                <h4>Teacher Details</h4>
+                <div class="mb-3">
+                    <label class="form-label" for="designation">Designation</label>
+                    <input type="text" class="form-control" id="designation" name="designation">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="subject">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Create Account</button>
+        </form>
+    </div>
+
+    <script>
+       document.addEventListener("DOMContentLoaded", function () {
+    const checkboxes = document.querySelectorAll(".role-checkbox");
+    const studentFields = document.getElementById("student-fields");
+    const parentFields = document.getElementById("parent-fields");
+    const teacherFields = document.getElementById("teacher-fields");
+
+    function toggleFields(event) {
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox !== event.target) {
+                checkbox.checked = false;
+            }
+        });
+
+
+        studentFields.classList.add("hidden");
+        parentFields.classList.add("hidden");
+        teacherFields.classList.add("hidden");
+
+
+        if (document.getElementById("is_student").checked) {
+            studentFields.classList.remove("hidden");
+            parentFields.classList.remove("hidden");
+        } else if (document.getElementById("is_parent").checked) {
+            parentFields.classList.remove("hidden");
+        } else if (document.getElementById("is_teacher").checked) {
+            teacherFields.classList.remove("hidden");
+        }
+    }
+
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", toggleFields);
+    });
+});
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

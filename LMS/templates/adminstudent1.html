@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+ <div class="container">
+        <h1>Student List</h1>
+        <ul class="staff-list">
+            {% for item in student %}
+                <li class="staff-item">
+                    <a class="link-box" href="{% url 'LMSapp:adminstudentedit'  item.id item.class_assigned %}">
+                        {{ item.user.username }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

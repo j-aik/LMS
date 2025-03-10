@@ -4,42 +4,104 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
-                .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 10px;
-            width: 30%;
+          .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    margin: 15% auto;
+    width: 40%;
+    border-radius: 10px;
+    text-align: center;
+  }
+
+  .close {
+    color: red;
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+  }
+          body {
+            font-family: Arial, sans-serif;
             text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
         }
-        .modal button {
-            margin: 10px;
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
+
+        h1 {
+            margin-top: 20px;
+            color: #333;
         }
-        .modal .confirm { background-color: red; color: white; }
-        .modal .cancel { background-color: gray; color: white; }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            gap: 20px;
+        }
+
+        .box {
+            width: 120px;
+            height: 120px;
+            background-color: #ff4d4d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .box a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .box:hover {
+            transform: scale(1.1);
+            box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.3);
+        }
     </style>
+
 </head>
 <body>
-<h1>Hai admin, {{ f }}</h1>
+    <h1>Hai Admin, {{ f }}</h1>
+
+    <div class="container">
+        <div class="box">
+            <a href="{% url 'LMSapp:adminstudent' %}">Student</a>
+        </div>
+        <div class="box">
+            <a href="{% url 'LMSapp:adminparent' %}">Parent</a>
+        </div>
+        <div class="box">
+            <a href="{% url 'LMSapp:adminstaff' %}">Staff</a>
+        </div>
+        <div class="box">
+            <a href="{% url 'LMSapp:createuser' %}">CREATE USER</a>
+        </div>
+    </div>
+
+
+
 <h1>All Users</h1>
     <ul>
         {% for item in f1 %}
             <li>
-                {{ item.username }}
+                <p id="user-{{ item.id }}">{{ item.username }}</p>
        <button class="delete" onclick=""
         style="background-color: red; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
           <a href="{% url 'LMSapp:delete' item.id %}">
@@ -70,69 +132,85 @@
 </span>
 
  {% endif %}
+ <span>
+
+</span>
+<button class="delete" onclick="openEditModal({{ item.id }})"
+style="background-color: red; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
+    Edit
+</button>
+
+
+{% endfor %}
+</ul>
 
 
 
-        {% endfor %}
-    </ul>
 
-<div id="confirmationModal" class="modal">
-        <div class="modal-content">
-            <p id="modalMessage">change the options</p>
-            <button class="confirm" id="confirmAction">Yes</button>
 
-            <button class="cancel" onclick="closeModal()">Cancel</button>
-        </div>
+<!-- Modal -->
+<div id="editModal" class="modal open-edit-modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditModal()">&times;</span>
+        <div id="modal-body"></div>
+    </div>
 </div>
 
- <script>
-        let actionType = "";
-        let userId = "";
+  <script>
+function openEditModal(userId) {
+    fetch(`/admin1/${userId}`)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("modal-body").innerHTML = data;
+            document.getElementById("editModal").style.display = "block";
+        })
+        .catch(error => console.error("Error loading form:", error));
+}
 
-        function openModal(action, id) {
-            actionType = action;
-            userId = id;
-            document.getElementById("modalMessage").innerText =
-                action === "delete" ? "Are you sure you want to delete this user?"
-                                    : "Are you sure you want to deactivate this user?";
+function closeEditModal() {
+    document.getElementById("editModal").style.display = "none";
+    document.getElementById("modal-body").innerHTML = "";
+}
 
-            document.getElementById("confirmationModal").style.display = "block";
+function submitEditForm() {
+    let form = document.getElementById("editForm");
+    let formData = new FormData(form);
+    let userId = document.getElementById("userId").value;
+
+    fetch(`/admin1/${userId}`, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        let contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return response.json();
+        } else {
+            return response.text();
         }
+    })
+    .then(data => {
+        if (typeof data === "object" && data.success) {
+            let updatedUsername = formData.get("username");
+            console.log("Updated Username:", updatedUsername);
 
-        function closeModal() {
-            document.getElementById("confirmationModal").style.display = "none";
-        }
-
-        document.getElementById("confirmAction").addEventListener("click", function () {
-            if (actionType === "delete") {
-                fetch(`/delete-user/${userId}/`, { method: "POST", headers: { "X-CSRFToken": getCSRFToken() } })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("User deleted successfully!");
-                            location.reload();
-                        } else {
-                            alert("Error deleting user.");
-                        }
-                    });
-            } else if (actionType === "deactivate") {
-                fetch(`/deactivate-user/${userId}/`, { method: "POST", headers: { "X-CSRFToken": getCSRFToken() } })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("User deactivated successfully!");
-                            location.reload();
-                        } else {
-                            alert("Error deactivating user.");
-                        }
-                    });
+            let usernameElement = document.getElementById(`user-${userId}`);
+            if (usernameElement) {
+                usernameElement.textContent = updatedUsername;
+            } else {
+                console.error("Username element not found:", `user-${userId}`);
             }
-            closeModal();
-        });
 
-        function getCSRFToken() {
-            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+            closeEditModal();
+        } else {
+            console.error("Unexpected response:", data);
+            alert("Error updating user.");
         }
-    </script>
+    })
+    .catch(error => console.error("Error submitting form:", error));
+}
+
+
+</script>
 </body>
 </html>
