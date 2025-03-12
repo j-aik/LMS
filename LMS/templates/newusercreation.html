@@ -44,29 +44,36 @@
                 <label class="form-label" for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
+<select name="classst" id="classst">
+                      <option value="">Select a class</option>
+                                 {% for cls in classst %}
+                      <option value="{{ cls.id }}">{{ cls.name }}</option>
+                                 {% endfor %}
+                </select>
+                   <br>
+                   <P>OR ASSIGN A NEW CLASS</P>
+                   <br>
+                <div class="mb-3,m1" id="m1">
+                    <label class="form-label" for="student_class">Class Assigned</label>
+                    <input type="text" class="form-control" id="student_class" name="class_assigned">
+                </div>
 
             <h3>User Roles</h3>
 <div class="form-check">
-    <input type="hidden" name="is_student" value="False">
-    <input type="checkbox" class="form-check-input role-checkbox" id="is_student" name="is_student" value="True">
+    <input type="checkbox" class="form-check-input role-checkbox" id="is_student" name="is_student">
     <label class="form-check-label" for="is_student">Student</label>
 </div>
 
 <div class="form-check">
-    <input type="hidden" name="is_parent" value="False">
-    <input type="checkbox" class="form-check-input role-checkbox" id="is_parent" name="is_parent" value="True">
+    <input type="checkbox" class="form-check-input role-checkbox" id="is_parent" name="is_parent">
     <label class="form-check-label" for="is_parent">Parent</label>
 </div>
 
-<div class="form-check">
-    <input type="hidden" name="is_admin" value="False">
-    <input type="checkbox" class="form-check-input role-checkbox" id="is_admin" name="is_admin" value="True">
-    <label class="form-check-label" for="is_admin">Admin</label>
-</div>
+
+
 
 <div class="form-check">
-    <input type="hidden" name="is_teacher" value="False">
-    <input type="checkbox" class="form-check-input role-checkbox" id="is_teacher" name="is_teacher" value="True">
+    <input type="checkbox" class="form-check-input role-checkbox" id="is_teacher" name="is_teacher">
     <label class="form-check-label" for="is_teacher">Teacher</label>
 </div>
 
@@ -77,10 +84,7 @@
                     <label class="form-label" for="dob">Date of Birth</label>
                     <input type="date" class="form-control" id="dob" name="date_of_birth">
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="student_class">Class Assigned</label>
-                    <input type="text" class="form-control" id="student_class" name="class_assigned">
-                </div>
+
                 <div class="mb-3">
                     <label class="form-label" for="attendance">Attendance Percentage</label>
                     <input type="number" class="form-control" id="attendance" name="attendence_percentage" min="0" max="100">
@@ -88,11 +92,11 @@
             </div>
 
             <!-- Parent Fields -->
-            <div id="parent-fields" class="hidden">
+            <div id="parent-fields" class="hidden" >
                 <h4>Parent Details</h4>
-                <div class="mb-3">
+            <div class="mb-3" id="go">
                 <label class="form-label" for="username">Username</label>
-                <input type="text" class="form-control" id="username" name="pusername" required>
+                <input type="text" class="form-control" id="pusername" name="pusername" >
             </div>
                 <div class="mb-3">
                     <label class="form-label" for="parent_phone">Phone Number</label>
@@ -145,7 +149,10 @@
         if (document.getElementById("is_student").checked) {
             studentFields.classList.remove("hidden");
             parentFields.classList.remove("hidden");
+
         } else if (document.getElementById("is_parent").checked) {
+            g = document.getElementById("go")
+            g.style.display= "none";
             parentFields.classList.remove("hidden");
         } else if (document.getElementById("is_teacher").checked) {
             teacherFields.classList.remove("hidden");
@@ -157,6 +164,24 @@
         checkbox.addEventListener("change", toggleFields);
     });
 });
+
+ document.getElementById("classst").addEventListener("change", function() {
+        let selectedValue = this.value;
+        let classAssignedDiv = document.getElementById("m1");
+
+
+         if (selectedValue) {
+            classAssignedDiv.style.display = "none";
+            attendanceDiv.style.display = "none";
+        } else {
+            classAssignedDiv.style.display = "block";
+            attendanceDiv.style.display = "block";
+        }
+    });
+
+
+
+
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

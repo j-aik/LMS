@@ -54,17 +54,17 @@ class Parent(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15)
     address = models.TextField()
-    class_assigned = models.ForeignKey(ClassST, on_delete=models.CASCADE, null=True, blank=True)
+    class_assigned = models.ForeignKey(ClassST, on_delete=models.CASCADE, null=True,blank=True)
     def __str__(self):
         return self.user.username
 
 
 
 class Staff(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     designation = models.CharField(max_length=100)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)
-    class_assigned = models.ForeignKey(ClassST, on_delete=models.CASCADE, null=True, blank=True)
+    subject = models.ManyToManyField(Subject,blank=True)
+    class_assigned = models.ForeignKey(ClassST,blank=True,null=True,on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15)
 
     def __str__(self):
@@ -82,3 +82,27 @@ class Student(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+
+
+
+class Assigned(models.Model):
+    staff = models.ForeignKey(Staff,on_delete=models.SET_NULL,null=True,blank=True)
+    subject = models.ManyToManyField(Subject,blank=True)
+    class_assigned = models.ForeignKey(ClassST,on_delete=models.SET_NULL,null=True,blank=True)
+
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # ForeignKey fields with null=True and blank=True to allow flexibility
+    staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True, blank=True)
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, null=True, blank=True)
+    parent = models.ForeignKey(Parent, on_delete=models.SET_NULL, null=True, blank=True)
+    class_assigned = models.ForeignKey(ClassST, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.title

@@ -74,10 +74,59 @@
             transform: scale(1.1);
             box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.3);
         }
+
     </style>
 
 </head>
 <body>
+       <div class="container1" style="width:80%;height:800px;">
+        <h2>Create Announcement</h2>
+        <form action="" method="POST">
+            {% csrf_token %}
+
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+
+            <label for="staff">Staff:</label>
+            <select id="staff" name="staff">
+                <option value="">Select Staff</option>
+                {% for staff in staff_list %}
+                    <option value="{{ staff.id }}">{{ staff.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="student">Student:</label>
+            <select id="student" name="student">
+                <option value="">Select Student</option>
+                {% for student in student_list %}
+                    <option value="{{ student.id }}">{{ student.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="parent">Parent:</label>
+            <select id="parent" name="parent">
+                <option value="">Select Parent</option>
+                {% for parent in parent_list %}
+                    <option value="{{ parent.id }}">{{ parent.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="class_assigned">Class Assigned:</label>
+            <select id="class_assigned" name="class_assigned">
+                <option value="">Select Class</option>
+                {% for class_st in class_list %}
+                    <option value="{{ class_st.id }}">{{ class_st.name }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Submit Announcement</button>
+        </form>
+    </div>
+
+
     <h1>Hai Admin, {{ f }}</h1>
 
     <div class="container">

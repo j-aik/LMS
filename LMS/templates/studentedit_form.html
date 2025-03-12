@@ -5,93 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Student Details</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .container {
-            max-width: 600px;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
-        }
-
-        h2, h3 {
-            color: #333;
-        }
-
-        label {
-            font-weight: bold;
-        }
-
-        .form-control {
-            border-radius: 5px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 5px;
-            transition: background 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="container mt-5">
         <h2 class="mb-4 text-center">Edit Student Details</h2>
         <form method="post">
             {% csrf_token %}
 
-            <!-- User Field -->
-
             <!-- Date of Birth -->
             <div class="mb-3">
                 <label class="form-label">Date of Birth</label>
-                {{ form.date_of_birth }}
+                <input type="date" class="form-control" name="date_of_birth" value="{{ form.date_of_birth.value|default:'' }}">
             </div>
 
             <!-- Class Assigned -->
             <div class="mb-3">
-                <label class="form-label">Class Assigned</label>
-                {{ form.class_assigned }}
-            </div>
-
+    <label class="form-label">Class Assigned</label>
+    <select class="form-select" name="class_assigned">
+        <option value="">Select a class</option>
+        {% for class in form.class_assigned.field.queryset %}
+            <option value="{{ class.id }}" {% if form.class_assigned.value == class.id %}selected{% endif %}>
+                {{ class.name }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
 
             <!-- Parent -->
             <div class="mb-3">
                 <label class="form-label">Parent</label>
-                {{ form.parent }}
+                <input type="text" class="form-control" name="parent" value="{{ form.parent.value|default:'' }}" placeholder="Enter parent's name">
             </div>
 
             <!-- Attendance Percentage -->
             <div class="mb-3">
                 <label class="form-label">Attendance Percentage</label>
-                {{ form.attendence_percentage }}
+                <input type="number" class="form-control" name="attendence_percentage" min="0" max="100" value="{{ form.attendence_percentage.value|default:'' }}">
             </div>
 
             <!-- User Details Section -->
             <h3 class="mt-4 text-center">User Details</h3>
+
             <div class="mb-3">
                 <label class="form-label">Username</label>
-                {{ user_form.username }}
+                <input type="text" class="form-control" name="username" value="{{ user_form.username.value|default:'' }}" placeholder="Enter username">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                {{ user_form.email }}
+                <input type="email" class="form-control" name="email" value="{{ user_form.email.value|default:'' }}" placeholder="Enter email">
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
         </form>
     </div>
 

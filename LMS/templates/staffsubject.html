@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2>Staff and Their Subjects</h2>
+
+    <ul>
+        {% for subject in l.subject.all %}
+            <li>{{ subject.subject }}</li>
+        {% empty %}
+            <li>No subjects assigned.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

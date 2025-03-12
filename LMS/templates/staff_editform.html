@@ -80,21 +80,30 @@
             <label for="designation">Designation:</label>
             <input type="text" id="designation" name="designation" value="{{ form.designation.value|default_if_none:'' }}" required>
 
-            <label for="subject">Subject:</label>
-             <select id="subject" name="subject">
-    {% for subject in form.fields.subject.queryset %}
-    <option value="{{ subject.id }}" {% if form.subject.value == subject.id %}selected{% endif %}>
-        {{ subject.subject }}
-    </option>
+            <p>Subjects Assigned:</p>
+<ul>
+    {% for subject in staff.subject.all %}
+        <li>{{ subject.subject }}</li>
+    {% endfor %}
+</ul>
+
+<p>Classes Assigned:</p>
+<ul>
+    {% for class_obj in staff.class_assigned.all %}
+        <li>{{ class_obj.name }}</li>
+    {% endfor %}
+</ul>
+{{ staff.subject.all }}
+{{ staff.class_assigned.all }}
+ <select id="class_assigned" name="class_assigned">
+    {% for class in form.class_assigned.field.queryset %}
+        <option value="{{ class.id }}" {% if form.class_assigned.value == class.id %}selected{% endif %}>
+            {{ class.name }}
+        </option>
     {% endfor %}
 </select>
 
-            <label for="class_assigned">Class Assigned:</label>
-            <select id="class_assigned" name="class_assigned">
-                {% for class in form.class_assigned.field.queryset %}
-                <option value="{{ class.id }}" {% if form.class_assigned.value == class.id %}selected{% endif %}>{{ class.name }}</option>
-                {% endfor %}
-            </select>
+
 
             <label for="phone_number">Phone Number:</label>
             <input type="text" id="phone_number" name="phone_number" value="{{ form.phone_number.value|default_if_none:'' }}" required>

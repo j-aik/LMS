@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import render,redirect, get_object_or_404
-from LMSapp.models import CustomUser,ClassST,Parent,Staff,Student,Subject
+from LMSapp.models import CustomUser,ClassST,Parent,Staff,Student,Subject,Assigned
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from .forms import UserEditForm,ParentEditForm,StaffEditForm,StudentEditForm
@@ -21,7 +21,52 @@ def parent(request):
 
 def staff(request):
     f = request.user.username
-    return render(request, 'staff.html',{'f':f})
+    f1 = Staff.objects.filter(user__username = f)
+    h = []
+    h1 = set()
+    for i in f1:
+            h.append(i.subject)
+            h1.add(i.class_assigned.name)
+            print(h1)
+    h1 = list(h1)
+    return render(request, 'staff.html',{'f':f,'f1':f1,'h1':h1})
+
+
+def staffstudent(request):
+    f = request.user.username
+    f1 = Staff.objects.filter(user__username=f)
+    h = []
+    h1 = []
+    for i in f1:
+            h.append(i.subject)
+            h1.append(i.class_assigned.name)
+    print(h1,"this is h1")
+    print(h,"this is h")
+    for i in f1:
+
+            f3 = i
+            f6 = ClassST.objects.filter(name=i.class_assigned.name).first()
+
+            # Check if an Assigned object already exists
+            f7, created = Assigned.objects.get_or_create(
+                staff=f3,
+                class_assigned=f6,
+            )
+            assigned_subjects = list(f7.subject.all())
+
+
+            print(assigned_subjects, "Current subjects in f7")
+
+
+
+            for subj in h:
+               if subj not in assigned_subjects:
+
+                   f7.subject.add(subj)
+                   f7.save()
+
+    return render(request, 'staff.html', {'f': f, 'f1': f1 , 'h1':h1})
+
 
 def admin1(request,id=0):
     f = request.user.username
@@ -177,16 +222,19 @@ def adminstudentedit(request,p,m):
         form = StudentEditForm(request.POST, instance=f3)
         print("User Form Errors:", user_form.errors)
         print("Student Form Errors:", form.errors)
-        if user_form.is_valid() and form.is_valid() :
+        if user_form.is_valid() and form.is_valid():
+            print(form.cleaned_data)
             user_form.save()
             form.save()
+            print("is saved")
+
             return adminstudent1(request,m)
         else:
             return adminstudent1(request,m)
     else:
         user_form = UserEditForm(instance=user)
         form = StudentEditForm(instance=f3)
-        print(form)
+
         return render(request, 'studentedit_form.html', {'form': form,'user_form':user_form})
 
 
@@ -201,15 +249,11 @@ def adminstudent1(request,p):  # for showing class class data about usercreation
 
 
 def createuser(request):
+    classst = ClassST.objects.all()
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
-        is_student = request.POST["is_student"]
-        is_parent = request.POST["is_parent"]
-        is_admin = request.POST["is_admin"]
-        is_teacher = request.POST["is_teacher"]
         dob = request.POST["date_of_birth"]
-        class_assigned = request.POST["class_assigned"]
         attendence_percentage =  request.POST["attendence_percentage"]
         password = "1234"
         phone_number = request.POST["phone_number"]
@@ -217,42 +261,48 @@ def createuser(request):
         address    = request.POST["address"]
         designation = request.POST['designation']
         subject = request.POST['subject']
-        is_student = request.POST.get("is_student") == True
-        is_parent = request.POST.get("is_parent") == True
-        is_admin = request.POST.get("is_admin") == True
+        is_student = request.POST.get("is_student") is not None
+        is_parent = request.POST.get("is_parent") is not None
+        is_teacher = request.POST.get("is_teacher") is not None
+        try:
+            class_assigned  =  request.POST['classst']
+            class_assigned = ClassST.objects.get(id=class_assigned)
+        except:
+            class_assigned = request.POST["class_assigned"]
+            class_assigned = ClassST.objects.create(name=class_assigned)
 
-        print(f"Student: {is_student}, Parent: {is_parent}, Admin: {is_admin}")
+        print(f"Student: {is_student}, Parent: {is_parent}, teacher: {is_teacher}")
 
-        user = CustomUser.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            is_student=is_student,
-            is_parent=is_parent,
-            is_admin=is_admin,
-            is_teacher=is_teacher
-        )
+
+        print(is_student, "student tag")
         if is_student:
-            date_of_birth = request.POST.get["date_of_birth"]
-            class_assigned_id = request.POST.get["class_assigned"]
-            parent_id = request.POST.get["parent"]
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                is_student=is_student,
+                is_parent=is_parent,
+                is_teacher=is_teacher
+            )
+            print(is_student,"student tag")
+            date_of_birth = request.POST["date_of_birth"]
 
-            class_assigned = ClassST.objects.create(name=class_assigned_id)
-            class_assigned.save()
-            is_parent = True,
+
+
             puser = CustomUser.objects.create_user(
                 username=pusername,
                 email=email,
                 password=password,
                 is_student=is_student,
                 is_parent=is_parent,
-                is_admin=is_admin,
                 is_teacher=is_teacher
             )
+
             parent = Parent.objects.create(
                 user=puser,
                 phone_number=phone_number,
-                address=address
+                address=address,
+                class_assigned = class_assigned
             )
             s = Student.objects.create(
                 user=user,
@@ -266,13 +316,22 @@ def createuser(request):
             parent.save()
 
             s.save()
+            print(is_parent, "parent tag")
         elif is_parent:
-            phone_number = request.POST.get["phone_number"]
-            address = request.POST.get["address"]
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                is_student=is_student,
+                is_parent=is_parent,
+                is_teacher=is_teacher
+            )
+            print(is_parent, "parent tag")
+            phone_number = request.POST["phone_number"]
+            address = request.POST["address"]
 
 
-            class_assigned = ClassST.objects.create(name=class_assigned)
-            class_assigned.save()
+
             p = Parent.objects.create(
                 user=user,
                 phone_number=phone_number,
@@ -283,20 +342,62 @@ def createuser(request):
         elif is_teacher:
             designation = request.POST["designation"]
             phone_number = request.POST["phone_number"]
-            class_assigned_id = request.POST["class_assigned"]
             subject_id = request.POST["subject"]
-            class_assigned = ClassST.objects.create(name=class_assigned_id)
-            class_assigned.save()
-
-            subject = Subject.objects.get(id=subject_id) if subject_id else None
-
-            p = Staff.objects.create(
+            h = Subject.objects.all()
+            u = []
+            for i in h:
+                u.append(i.subject)
+            if subject_id in u:
+                d =  Subject.objects.get(subject=subject_id)
+            else:
+                d = Subject.objects.create(subject=subject_id)
+            # try:
+            print(username,"This is username")
+            try:
+               try:
+                 user = CustomUser.objects.get(username=username)
+                 p = Staff.objects.get(
+                      user=user,
+                      class_assigned=class_assigned
+                  )
+                 p.subject.add(d)
+                 p.save()
+                 d.save()
+               except:
+                   user = CustomUser.objects.get(username=username)
+                   p = Staff.objects.create(
+                       user=user,
+                       class_assigned=class_assigned
+                   )
+                   p.subject.add(d)
+                   p.save()
+                   d.save()
+            except:
+                user = CustomUser.objects.create_user(
+                  username=username,
+                  email=email,
+                  password=password,
+                  is_student=is_student,
+                 is_parent=is_parent,
+                 is_teacher=is_teacher
+                 )
+                p = Staff.objects.create(
                 user=user,
                 designation=designation,
                 phone_number=phone_number,
-                class_assigned=class_assigned,
-                subject=subject
-            )
-            p.save()
+                class_assigned = class_assigned
+                 )
+                p.subject.set([d])
+                p.save()
+                d.save()
 
-    return render(request, 'newusercreation.html', {'student': student})
+
+    return render(request, 'newusercreation.html', {'student': student,'classst': classst})
+
+
+def staffclass(request,p):
+    print(p)
+    g = request.user
+    l = Staff.objects.get(user=g,class_assigned__name=p)
+    print(l)
+    return render(request, 'staffsubject.html', {'l':l})

@@ -22,5 +22,6 @@ urlpatterns = [
     path('adminstudent1/<str:p>',views.adminstudent1,name="adminstudent1"), #taking all the details about student
     path('adminstudentedit/<str:p>/<str:m>', views.adminstudentedit,name="adminstudentedit"),  # editing the students
     path('createuser', views.createuser,name="createuser"),
-
+    path('staffstudent',views.staffstudent,name="staffstudent"), # showing the class associated with the each class for staff
+    path('staffclass/<str:p>',views.staffclass,name="staffclass") # showing the subjects associated with the each class for staff
 ]
